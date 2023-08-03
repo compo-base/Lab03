@@ -24,12 +24,12 @@ const router = createRouter({
     },
     {
       path: '/organizer',
-      name: 'OrganizerView',
+      name: 'Organize',
       component: OrganizerView
     },
     {
       path: '/students',
-      name: 'StudentView',
+      name: 'students',
       component: StudentView
     },
     {
