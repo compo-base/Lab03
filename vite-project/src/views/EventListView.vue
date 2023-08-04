@@ -9,31 +9,40 @@ import EventService from '@/services/EventService'
 import type { Axios, AxiosResponse } from 'axios'
 const events: Ref<Array<EventItem>> = ref([])
 const totalEvent = ref<number>(0)
+const eventsPerPage = ref(2) //initial value of events
 const props = defineProps({
   page: {
     type: Number,
     required: true
   }
 })
-EventService.getEvent(2, props.page).then((response: AxiosResponse<EventItem[]>) => {
-  events.value = response.data
-})
+EventService.getEvent(eventsPerPage.value, props.page).then(
+  (response: AxiosResponse<EventItem[]>) => {
+    events.value = response.data
+  }
+)
 
 watchEffect(() => {
-  EventService.getEvent(2, props.page).then((response: AxiosResponse<EventItem[]>) => {
-    events.value = response.data
-    totalEvent.value = response.headers['x-total-count']
-  })
+  EventService.getEvent(eventsPerPage.value, props.page).then(
+    (response: AxiosResponse<EventItem[]>) => {
+      events.value = response.data
+      totalEvent.value = response.headers['x-total-count']
+    }
+  )
 })
 const hasNextPages = computed(() => {
   //first calculate total page
-  const totalPages = Math.ceil(totalEvent.value / 2)
+  const totalPages = Math.ceil(totalEvent.value / eventsPerPage.value)
   return props.page.valueOf() < totalPages
 })
 </script>
 
 <template>
   <main class="events">
+    <div class="events-input">
+      <label for="events-per-page">Events per page:</label>
+      <input type="number" id="events-per-page" v-model.number="eventsPerPage" />
+    </div>
     <EventCard v-for="event in events" :key="event.id" :event="event"></EventCard>
     <div class="pagination">
       <RouterLink
